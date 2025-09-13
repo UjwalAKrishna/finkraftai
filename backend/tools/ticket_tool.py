@@ -40,27 +40,23 @@ class TicketTool(BaseTool):
         ]
     
     def execute(self, params: Dict[str, Any], user_context: UserContext) -> ToolResult:
-        """Simple mock implementation that creates a ticket"""
+        """Create a ticket using ticket service"""
         
         title = params.get("title")
         description = params.get("description")
         priority = params.get("priority", "medium")
         
-        # Mock ticket creation
-        ticket_id = f"TIC-{int(time.time()) % 10000}"
-        
-        mock_result = {
-            "ticket_id": ticket_id,
-            "title": title,
-            "description": description,
-            "priority": priority,
-            "status": "open",
-            "created_by": user_context.user_id,
-            "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
-        }
+        # Use ticket service
+        from backend.services.ticket_service import ticket_service
+        ticket = ticket_service.create_ticket(
+            title=title,
+            description=description,
+            created_by=user_context.user_id,
+            priority=priority
+        )
         
         return ToolResult(
             status=ToolResultStatus.SUCCESS,
-            data=mock_result,
-            message=f"Created ticket {ticket_id}: {title}"
+            data=ticket.to_dict(),
+            message=f"Created ticket {ticket.id}: {title}"
         )

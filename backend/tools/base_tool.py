@@ -20,13 +20,21 @@ class ToolResult:
 
 
 class UserContext:
-    """Simple user context"""
-    def __init__(self, user_id: str, role: str, workspace_id: str = "default", session_id: str = "default", permissions: List[str] = None):
+    """User context with database-driven permissions"""
+    def __init__(self, user_id: str, workspace_id: str = "default", session_id: str = "default"):
         self.user_id = user_id
-        self.role = role
         self.workspace_id = workspace_id
         self.session_id = session_id
-        self.permissions = permissions or []
+        
+        # Load permissions from database
+        from database.repositories.permission_repo import permission_repo
+        self.permissions = permission_repo.get_user_permissions(user_id)
+        self.groups = permission_repo.get_user_groups(user_id)
+        self.can_see_traces = permission_repo.can_see_traces(user_id)
+        self.user_info = permission_repo.get_user_info(user_id)
+        
+        # Set primary role (first group or default)
+        self.role = self.groups[0] if self.groups else "Viewer"
 
 
 class ToolParameter:

@@ -1,54 +1,48 @@
-# Simple tool registry - loads tools and permissions from config
+# Database-driven tool registry
 
-import json
-import os
 from typing import Dict, List, Optional
 from backend.tools import get_tool, get_all_tools
 from backend.tools.base_tool import UserContext
+from database.repositories.permission_repo import permission_repo
+
 
 class ToolRegistry:
-    """Simple registry for managing tools and permissions"""
+    """Database-driven registry for managing tools and permissions"""
     
     def __init__(self):
-        self.tools_config = self._load_config("config/actions.json")
-        self.roles_config = self._load_config("config/roles.json")
+        # Load available tools from the tools module
+        self.available_tools = get_all_tools()
         
-    def _load_config(self, file_path: str) -> dict:
-        """Load JSON config file"""
-        try:
-            with open(file_path, 'r') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            return {}
+    def get_allowed_tools(self, user_id: str) -> List[str]:
+        """Get list of tools allowed for a user based on database permissions"""
+        user_permissions = permission_repo.get_user_permissions(user_id)
+        
+        # Filter available tools by user permissions
+        allowed_tools = []
+        for tool_name in self.available_tools.keys():
+            if tool_name in user_permissions:
+                allowed_tools.append(tool_name)
+        
+        return allowed_tools
     
-    def get_allowed_tools(self, role: str) -> List[str]:
-        """Get list of tools allowed for a role"""
-        for role_config in self.roles_config.get("roles", []):
-            if role_config["name"] == role:
-                return role_config.get("permissions", [])
-        return []
-    
-    def can_use_tool(self, tool_name: str, role: str) -> bool:
-        """Check if role can use a specific tool"""
-        allowed_tools = self.get_allowed_tools(role)
+    def can_use_tool(self, tool_name: str, user_id: str) -> bool:
+        """Check if user can use a specific tool"""
+        allowed_tools = self.get_allowed_tools(user_id)
         return tool_name in allowed_tools
     
-    def can_see_traces(self, role: str) -> bool:
-        """Check if role can see execution traces"""
-        for role_config in self.roles_config.get("roles", []):
-            if role_config["name"] == role:
-                return role_config.get("can_see_traces", False)
-        return False
+    def can_see_traces(self, user_id: str) -> bool:
+        """Check if user can see execution traces"""
+        return permission_repo.can_see_traces(user_id)
     
     def execute_tool(self, tool_name: str, params: dict, user_context: UserContext):
         """Execute a tool with permission checking"""
         
         # Check permissions
-        if not self.can_use_tool(tool_name, user_context.role):
+        if not self.can_use_tool(tool_name, user_context.user_id):
             from backend.tools.base_tool import ToolResult, ToolResultStatus
             return ToolResult(
                 status=ToolResultStatus.PERMISSION_DENIED,
-                message=f"Role '{user_context.role}' not allowed to use tool '{tool_name}'"
+                message=f"User '{user_context.user_id}' not allowed to use tool '{tool_name}'"
             )
         
         # Get and execute tool
@@ -62,9 +56,43 @@ class ToolRegistry:
                 message=str(e)
             )
     
-    def get_available_roles(self) -> List[str]:
-        """Get list of all available roles"""
-        return [role["name"] for role in self.roles_config.get("roles", [])]
+    def get_user_summary(self, user_id: str) -> dict:
+        """Get user permission summary"""
+        user_info = permission_repo.get_user_info(user_id)
+        if not user_info:
+            return {"error": "User not found"}
+        
+        return {
+            "user_info": user_info,
+            "groups": permission_repo.get_user_groups(user_id),
+            "permissions": permission_repo.get_user_permissions(user_id),
+            "allowed_tools": self.get_allowed_tools(user_id),
+            "can_see_traces": self.can_see_traces(user_id)
+        }
+    
+    def get_available_tools_info(self, user_id: str) -> List[dict]:
+        """Get information about tools available to user"""
+        allowed_tools = self.get_allowed_tools(user_id)
+        
+        tools_info = []
+        for tool_name in allowed_tools:
+            if tool_name in self.available_tools:
+                tool = self.available_tools[tool_name]
+                tools_info.append({
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": [
+                        {
+                            "name": p.name,
+                            "type": p.type,
+                            "required": p.required,
+                            "description": p.description
+                        }
+                        for p in tool.get_parameters()
+                    ]
+                })
+        
+        return tools_info
 
 # Global registry instance
 registry = ToolRegistry()

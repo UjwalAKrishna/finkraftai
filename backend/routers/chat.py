@@ -1,1 +1,0 @@
-# Chat endpoints with session continuity

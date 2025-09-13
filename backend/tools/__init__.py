@@ -3,13 +3,17 @@
 from .filter_data_tool import FilterDataTool
 from .export_tool import ExportTool
 from .ticket_tool import TicketTool
+from .view_tickets_tool import ViewTicketsTool
+from .update_ticket_tool import UpdateTicketTool
 from .base_tool import BaseTool, ToolResult, ToolResultStatus, UserContext, ToolParameter
 
 # Registry of all available tools
 AVAILABLE_TOOLS = {
     "filter_data": FilterDataTool,
     "export_report": ExportTool,
-    "create_ticket": TicketTool
+    "create_ticket": TicketTool,
+    "view_tickets": ViewTicketsTool,
+    "update_ticket": UpdateTicketTool
 }
 
 def get_tool(tool_name: str) -> BaseTool:
