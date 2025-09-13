@@ -1,0 +1,1 @@
+# Cross-session user identity management

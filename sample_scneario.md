@@ -1,0 +1,3 @@
+Sample Scenario: 
+A customer types: “Filter invoices for last month, vendor=‘IndiSky’, status=failed.” Then: “Why did these fail?” Assistant explains (e.g., “missing GSTIN in 7 files”) and offers: “Create a ticket and notify me when fixed.” Next day, customer returns—chat shows prior context, open ticket, and a new update; customer says “download the fixed report.”
+What this tests: Do actions, explain context, create/track support, and continue the conversation across sessions with role-appropriate visibility.

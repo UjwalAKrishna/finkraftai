@@ -1,0 +1,14 @@
+{
+	"nodes":[
+		{"id":"user","type":"text","text":"User","x":50,"y":50,"width":100,"height":100},
+		{"id":"sqlite_db","type":"text","text":"SQLite3\n- conversations table (persisted memory)\n- tickets table\n- traces table\n- roles/config cache","x":650,"y":300,"width":230,"height":260},
+		{"id":"streamlit_ui","type":"text","text":"Streamlit UI\n- Chat UI\n- Context Pane\n- Allowed Actions View\n- Trace Viewer\n- Role Switcher (demo)","x":280,"y":-150,"width":240,"height":200},
+		{"id":"admin_ui","type":"text","text":"Admin / Config UI (optional)\n- Edit actions.json / roles.json\n- View traces & exports","x":240,"y":460,"width":220,"height":200},
+		{"id":"backend","type":"text","text":"FastAPI Backend\n- /message (orchestrator)\n- /actions (tool endpoints)\n- /tickets, /context, /traces\n- RBAC enforcement & plan validation\n- Trace logger\n- Config loader (actions.json, roles.json)","x":650,"y":-150,"width":270,"height":320},
+		{"id":"llm_provider","type":"text","text":"LLM Provider\n(OpenAI / Self-hosted)\n- Model calls for planning & explanations","x":1460,"y":-80,"width":200,"height":280},
+		{"id":"langchain_agent","type":"text","text":"LangChain Agent\n- Agent prompt templates\n- Tool specs (from config)\n- Conversation memory interface\n- Produces structured plan / clarifications\n- Final explanation generation","x":1050,"y":-130,"width":250,"height":300},
+		{"id":"tool_router","type":"text","text":"Tool Router / Action Handlers\n- filter_data, export_report, create_ticket\n- Validate args, deterministic execution\n- Generate artifacts (CSV), return results","x":1075,"y":350,"width":225,"height":310},
+		{"id":"external_apis","type":"text","text":"External Systems / APIs\n- Product APIs (optional)\n- File storage (report hosting)\n- Integrations (email, slack)","x":1460,"y":350,"width":240,"height":210}
+	],
+	"edges":[]
+}

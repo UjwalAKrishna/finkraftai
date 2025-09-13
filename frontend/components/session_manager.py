@@ -1,0 +1,1 @@
+# Session and user management component

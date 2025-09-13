@@ -1,0 +1,1 @@
+# Test implementation of the sample scenario from requirements

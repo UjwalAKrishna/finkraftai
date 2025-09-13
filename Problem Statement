@@ -1,0 +1,17 @@
+Project 4 — Unified In‑App Assistant (Do Actions • Explain Context • Handle Support)
+Story
+Customers want to talk to the product: “filter last month,” “download the report,” “why did this fail?” They expect continuity—tomorrow should feel like yesterday never ended, including open questions and ticket status. Access must respect roles—some info is shareable within a workspace, some isn’t.
+Problem Statement
+Deliver an in‑app assistant that customers can talk to for doing product actions, getting plain‑English explanations, and creating/tracking support tickets—with conversations that continue across sessions and visibility that matches their role.
+Key Requirements (only — from Customer)
+●	I just say it, it happens: Ask for product actions in simple language and see them done.
+●	Don’t make me repeat myself: Context continues—past requests and open items are present when I return.
+●	Explain it simply: Clear, short “what/why” answers.
+●	Show your work: See what exactly ran / data consulted.
+●	Only what I should see: Role/workspace governs what I can view or do.
+Deliverable (single)
+Streamlit app: Chat UI; “allowed actions” view; context pane (past requests & open tickets); trace viewer; basic role switch to demonstrate visibility. JSON persistence is fine.
+Hint
+Use a configurable framework for allowed actions, context surfaces, and role‑aware visibility so customers feel in control while the assistant does the heavy lifting.
+Note: Sample datasets and submission forms will follow in subsequent email chains. A high‑level walkthrough will be provided in tomorrow’s kickoff call.
+
