@@ -1,0 +1,251 @@
+
+# 📑 Technical Product Requirements Document (PRD)
+
+**Project:** Unified In-App Assistant (AI-based, Configurable, Role-Aware)
+**Tech Stack:** LangChain, FastAPI, Streamlit, SQLite3
+
+---
+
+## 1. Objective
+
+Build an **in-app conversational assistant** that enables users to:
+
+1. Perform product actions through natural language.
+2. Get simple explanations of what/why.
+3. Create and track support tickets.
+4. Maintain conversational continuity across sessions.
+5. Respect **role-based access control (RBAC)**.
+
+Deliverable for MVP: **A demoable application** combining a **Streamlit frontend**, **FastAPI backend**, **LangChain-based LLM orchestration**, and **SQLite3 persistence**.
+
+---
+
+## 2. Scope
+
+### In Scope (MVP)
+
+* **Chat assistant UI** in Streamlit with context pane, allowed actions view, role switcher.
+* **LLM-based agent (LangChain)** for intent parsing, tool selection, explanations.
+* **Configurable tools/actions** defined in JSON (tool schema, allowed roles).
+* **Role-aware visibility** (Admin, Manager, Viewer demo roles).
+* **Persistence in SQLite3** for:
+
+  * Conversations
+  * Tickets
+  * Traces
+* **Trace viewer** to show what exactly was executed.
+
+### Out of Scope (MVP, but future)
+
+* Multi-workspace authentication (SSO, JWT).
+* Advanced RAG (retrieval from large document sets).
+* Async job handling (long-running tasks).
+* Production monitoring (Prometheus, Jaeger).
+
+---
+
+## 3. User Stories
+
+1. **As a user**, I can type “filter last month sales” → assistant executes `filter_data` tool and shows results.
+2. **As a user**, I can ask “download this report” → assistant calls `export_report` and provides a link.
+3. **As a user**, I can ask “why did this fail?” → assistant explains based on trace + context.
+4. **As a manager**, I can create a support ticket directly from chat.
+5. **As a viewer**, I can only see reports, not create tickets or export.
+6. **As an admin**, I can see **trace logs** of what the assistant executed.
+
+---
+
+## 4. System Architecture
+
+### High-Level Components
+
+1. **Streamlit Frontend**
+
+   * Chat interface.
+   * Context/history panel (from SQLite).
+   * Allowed actions viewer (from config + role).
+   * Role switcher.
+   * Trace viewer (Admin only).
+
+2. **FastAPI Backend**
+
+   * `/message` → orchestrates LangChain agent workflow.
+   * `/actions/*` → deterministic tool execution layer.
+   * `/tickets/*` → support ticket CRUD.
+   * `/context/*` → fetch conversation context.
+   * `/config/*` → read/write tool & role configs.
+
+3. **LangChain Orchestration**
+
+   * **Agent** with tool definitions exposed from config.
+   * **Tools** call backend action functions (filter, export, create\_ticket).
+   * **Memory**: ConversationBufferMemory (persisted in SQLite).
+   * **Plan Validation**: JSON schema validation against allowed tools.
+
+4. **SQLite3 Persistence**
+
+   * `conversations` table: stores messages & metadata.
+   * `tickets` table: support ticket records.
+   * `traces` table: logs of prompts, plans, executions.
+   * `roles` table: role definitions (or loaded from config).
+
+---
+
+## 5. Data Model (SQLite3 Schema)
+
+```sql
+-- Conversations
+CREATE TABLE conversations (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
+    role TEXT,
+    message TEXT,
+    sender TEXT, -- user/assistant
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tickets
+CREATE TABLE tickets (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
+    title TEXT,
+    description TEXT,
+    status TEXT DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Traces
+CREATE TABLE traces (
+    id INTEGER PRIMARY KEY,
+    conversation_id INTEGER,
+    user_message TEXT,
+    llm_plan TEXT,
+    tool_calls TEXT,
+    results TEXT,
+    explanation TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Roles
+CREATE TABLE roles (
+    id INTEGER PRIMARY KEY,
+    role_name TEXT,
+    can_view TEXT, -- JSON array
+    can_do TEXT,   -- JSON array
+    can_see_traces BOOLEAN
+);
+```
+
+---
+
+## 6. Configurable Tools (JSON)
+
+**actions.json**
+
+```json
+[
+  {
+    "id": "filter_data",
+    "name": "filter_data",
+    "description": "Filter dataset by period and optional filters",
+    "params": ["dataset", "period", "filters"],
+    "roles_allowed": ["Admin", "Manager", "Viewer"]
+  },
+  {
+    "id": "export_report",
+    "name": "export_report",
+    "description": "Export dataset as CSV or Excel",
+    "params": ["dataset", "period", "format"],
+    "roles_allowed": ["Admin", "Manager"]
+  },
+  {
+    "id": "create_ticket",
+    "name": "create_ticket",
+    "description": "Create support ticket with title and description",
+    "params": ["title", "description"],
+    "roles_allowed": ["Admin", "Manager"]
+  }
+]
+```
+
+---
+
+## 7. API Endpoints (FastAPI)
+
+* `POST /message` → {user\_id, role, text} → response + trace\_id.
+* `POST /actions/{tool_id}` → execute tool with params.
+* `GET /tickets?user_id=` → list tickets.
+* `POST /tickets` → create ticket.
+* `GET /context/{user_id}` → fetch last N messages.
+* `GET /traces/{conversation_id}` → return execution logs (admin only).
+
+---
+
+## 8. LangChain Workflow
+
+1. **User input** → backend → LangChain agent.
+2. Agent prompt includes:
+
+   * Role context
+   * Available tools (from `actions.json`)
+   * Recent conversation history (from SQLite memory)
+3. Agent produces **structured plan** (JSON).
+4. Backend validates against role permissions.
+5. Backend executes allowed tools (deterministic Python functions).
+6. Agent receives tool outputs, generates final explanation.
+7. Persist: conversation, tool results, trace log in SQLite.
+8. Return response to Streamlit.
+
+---
+
+## 9. Tracing & Observability
+
+Each interaction → trace log:
+
+```json
+{
+  "trace_id": "tr-123",
+  "conversation_id": "c-456",
+  "user_message": "filter last month sales",
+  "llm_plan": "[{tool:filter_data,...}]",
+  "tool_calls": [{"tool":"filter_data","args":{"dataset":"sales","period":"last month"}}],
+  "results": {"rows":124},
+  "explanation": "Filtered sales for Aug 2025, 124 rows returned.",
+  "timestamp": "2025-09-13T12:00:00Z"
+}
+```
+
+Trace viewer in Streamlit (Admin only).
+
+---
+
+## 10. Security & Role Enforcement
+
+* Role switcher (demo) → but backend always validates role → tool mapping.
+* Traces restricted to Admin role.
+* User reset option: “forget conversation” (deletes history from SQLite).
+* No tool execution unless explicitly defined in `actions.json`.
+
+---
+
+## 11. Success Metrics (MVP)
+
+* 90% of test scenarios completed via natural language without error.
+* ≤ 2s latency for typical requests (excluding heavy LLM calls).
+* 100% of tool calls validated against schema before execution.
+* Role restrictions enforced consistently.
+* Trace logs available for 100% of interactions.
+
+---
+
+## 12. Roadmap (Post-MVP)
+
+* **Async jobs** for long-running actions (Celery/RQ).
+* **Multi-workspace RBAC** (JWT/OAuth2).
+* **RAG integration** for contextual explanations.
+* **Embeddings storage** in a vector DB (PGVector, Weaviate).
+* **Monitoring/analytics** (Prometheus, Grafana).
+
+---
+
+
