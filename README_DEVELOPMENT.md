@@ -1,1 +1,0 @@
-# Development Setup and Architecture Guide
