@@ -4,7 +4,7 @@ A conversational AI assistant that allows customers to interact with business sy
 
 ## 🎥 Demo Video
 
-**Watch the complete explanation and demo**: [`demo/demo.mp4`](demo/demo.mp4)
+**Watch the complete explanation and demo**: [🎬 Demo Video](https://drive.google.com/file/d/1Lr7X7EaqNXgY9N5f4fnMAjJXXBAQmK1r/view?usp=sharing)
 
 This video demonstrates the full system capabilities, conversation continuity, and all PRD requirements in action.
 
