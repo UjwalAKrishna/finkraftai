@@ -66,17 +66,12 @@ pip install -r requirements.txt
 echo "GEMINI_API_KEY=your_gemini_api_key_here" > .env
 ```
 
-4. **Initialize the database**
-```bash
-python database/init_db.py
-```
-
-5. **Start the backend server**
+4. **Start the backend server**
 ```bash
 python run_app.py
 ```
 
-6. **Start the frontend (in a new terminal)**
+5. **Start the frontend (in a new terminal)**
 ```bash
 cd frontend
 streamlit run app.py
@@ -113,25 +108,38 @@ pip install -r requirements.txt
 # 2. Set environment variables
 export GEMINI_API_KEY="your_gemini_api_key"
 
-# 3. Initialize database
-python database/init_db.py
-
-# 4. Run backend
+# 3. Run backend (database auto-initializes)
 python run_app.py &
 
-# 5. Run frontend
+# 4. Run frontend
 cd frontend && streamlit run app.py
 ```
 
 ### Docker Deployment
 
 ```bash
-# Build and run with Docker
+# Create .env file with your Gemini API key
+echo "GEMINI_API_KEY=your_actual_gemini_api_key" > .env
+
+# Build and run with Docker Compose
 docker-compose up --build
 
-# Or run individually
+# Access the application
+# - Frontend: http://localhost:8501  
+# - Backend API: http://localhost:8000
+```
+
+**Individual container deployment:**
+```bash
+# Backend only
 docker build -t finkraftai-backend .
 docker run -p 8000:8000 -e GEMINI_API_KEY=your_key finkraftai-backend
+
+# With persistent data
+docker run -p 8000:8000 \
+  -e GEMINI_API_KEY=your_key \
+  -v $(pwd)/data:/app/data \
+  finkraftai-backend
 ```
 
 ### Production Deployment
