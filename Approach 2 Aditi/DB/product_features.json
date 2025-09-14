@@ -1,0 +1,474 @@
+{
+  "website_features": {
+    "search_and_booking": [
+      {
+        "feature_id": "WF001",
+        "feature_name": "About Website/Smart Room Search",
+        "category": "Search & Discovery",
+        "description": "Intelligent search system with AI-powered recommendations and multi-criteria filtering for flights, trains, buses, and hotels",
+        "functionality": [
+          "Multi-city search capabilities",
+          "Flexible date search (±3 days)",
+          "Price range filtering",
+          "Real-time availability checking",
+          "Smart autocomplete for destinations",
+          "Recent searches memory",
+          "Popular destinations suggestions"
+        ],
+        "technical_details": {
+          "search_speed": "< 2 seconds",
+          "data_sources": "150+ airlines, 500+ hotels, Indian Railways, 1000+ bus operators",
+          "filters_available": 25,
+          "languages_supported": ["Hindi", "English", "Tamil", "Bengali", "Gujarati"],
+          "mobile_optimized": true
+        },
+        "user_benefits": [
+          "Find best deals quickly",
+          "Compare multiple options",
+          "Save time with smart filters",
+          "Discover new destinations",
+          "Easy mobile booking"
+        ],
+        "how_to_use": "Enter your departure city, destination, travel dates, and number of passengers. Use filters to narrow down results by price, timing, or preferences.",
+        "related_features": ["Price Comparison", "Booking Engine", "Trip Planner"]
+      },
+      {
+        "feature_id": "WF002", 
+        "feature_name": "One-Click Booking System",
+        "category": "Booking & Payments",
+        "description": "Streamlined booking process that allows users to complete reservations in just one click for registered users",
+        "functionality": [
+          "Saved payment methods",
+          "Stored passenger details",
+          "Auto-fill personal information",
+          "Express checkout option",
+          "Guest booking available",
+          "Group booking management",
+          "Corporate booking accounts",
+          "Booking modification options"
+        ],
+        "technical_details": {
+          "booking_completion_time": "< 30 seconds",
+          "payment_gateways": ["Razorpay", "PayU", "CCAvenue", "Paytm", "PhonePe", "GPay"],
+          "security_standards": "PCI DSS compliant, SSL encryption",
+          "success_rate": "99.2%",
+          "mobile_app_integrated": true
+        },
+        "user_benefits": [
+          "Super fast booking process",
+          "Secure payment handling",
+          "No need to re-enter details",
+          "Instant confirmation",
+          "Easy booking modifications"
+        ],
+        "how_to_use": "Create an account, save your details and payment methods. For future bookings, just select your preferred option and click 'Book Now'.",
+        "related_features": ["User Account Management", "Payment Gateway", "Booking History"]
+      },
+      {
+        "feature_id": "WF003",
+        "feature_name": "Real-Time Price Tracking",
+        "category": "Price Management",
+        "description": "Dynamic pricing system that tracks fare changes and sends alerts to users when prices drop or rise",
+        "functionality": [
+          "Price history graphs",
+          "Fare prediction algorithms",
+          "Price drop alerts via email/SMS",
+          "Best time to book suggestions",
+          "Price comparison across dates",
+          "Fare calendar view",
+          "Price watch list (up to 10 routes)",
+          "Historical data access (12 months)"
+        ],
+        "technical_details": {
+          "monitoring_frequency": "Every 2 hours",
+          "prediction_accuracy": "87% for next 7 days",
+          "data_retention": "18 months historical data",
+          "alert_methods": ["Email", "SMS", "Push Notifications", "WhatsApp"],
+          "tracking_capacity": "Unlimited routes per user"
+        },
+        "user_benefits": [
+          "Never miss a fare drop",
+          "Save money on bookings",
+          "Plan trips at optimal times",
+          "Make informed decisions",
+          "Track multiple routes simultaneously"
+        ],
+        "how_to_use": "Search for your desired route, click 'Track Price' button, set your preferred price range, and choose notification method.",
+        "related_features": ["Price Alerts", "Fare Calendar", "Deal Notifications"]
+      }
+    ],
+    "user_experience": [
+      {
+        "feature_id": "WF004",
+        "feature_name": "Personalized Dashboard",
+        "category": "User Experience",
+        "description": "Customized user interface showing personalized travel recommendations, booking history, and quick access to favorite routes",
+        "functionality": [
+          "Recent bookings display",
+          "Favorite destinations shortcuts",
+          "Personalized travel recommendations",
+          "Upcoming trip reminders",
+          "Quick rebooking options",
+          "Travel document reminders",
+          "Weather information for destinations",
+          "Local event suggestions"
+        ],
+        "technical_details": {
+          "personalization_engine": "ML-based recommendation system",
+          "data_points_analyzed": "50+ user behavior patterns",
+          "recommendation_accuracy": "78%",
+          "dashboard_load_time": "< 1.5 seconds",
+          "customization_options": 15
+        },
+        "user_benefits": [
+          "Tailored travel experience",
+          "Quick access to preferences",
+          "Never forget important trips",
+          "Discover relevant deals",
+          "Simplified rebooking process"
+        ],
+        "how_to_use": "Log into your account to access your personalized dashboard. Customize widgets by dragging and dropping sections you want to see.",
+        "related_features": ["User Profile", "Travel History", "Recommendation Engine"]
+      },
+      {
+        "feature_id": "WF005",
+        "feature_name": "Multi-Language Support",
+        "category": "Accessibility",
+        "description": "Comprehensive language support for India's diverse linguistic landscape with regional content localization",
+        "functionality": [
+          "Website translation in 8 Indian languages",
+          "Regional destination content",
+          "Local payment method names",
+          "Cultural festival travel suggestions",
+          "Regional customer support",
+          "Local currency display options",
+          "Regional promotional offers",
+          "State-specific travel guidelines"
+        ],
+        "technical_details": {
+          "supported_languages": ["Hindi", "English", "Tamil", "Telugu", "Bengali", "Gujarati", "Marathi", "Kannada"],
+          "translation_accuracy": "95%+ with native speakers",
+          "content_localization": "Regional festivals, destinations, customs",
+          "font_support": "Unicode compliant for all scripts",
+          "regional_payment_methods": "State-specific wallet integrations"
+        },
+        "user_benefits": [
+          "Use website in preferred language",
+          "Understand local travel context",
+          "Access region-specific deals",
+          "Get culturally relevant suggestions",
+          "Comfortable booking experience"
+        ],
+        "how_to_use": "Click on the language selector in the top navigation bar and choose your preferred language. Content and interface will automatically adapt.",
+        "related_features": ["Regional Content", "Cultural Calendar", "Local Support"]
+      },
+      {
+        "feature_id": "WF006",
+        "feature_name": "Mobile-First Design",
+        "category": "Mobile Experience", 
+        "description": "Responsive design optimized for mobile devices with touch-friendly interface and offline capabilities",
+        "functionality": [
+          "Touch-optimized interface",
+          "Swipe gestures for navigation",
+          "Offline booking history access",
+          "Location-based suggestions",
+          "Camera integration for document upload",
+          "Push notifications for bookings",
+          "Mobile wallet integration",
+          "One-thumb navigation design"
+        ],
+        "technical_details": {
+          "mobile_optimization_score": "98/100 (Google PageSpeed)",
+          "supported_devices": "iOS 12+, Android 8+",
+          "offline_functionality": "Booking history, saved searches",
+          "app_size": "< 25MB",
+          "loading_speed": "< 3 seconds on 3G"
+        },
+        "user_benefits": [
+          "Book tickets on the go",
+          "Fast mobile experience",
+          "Works with poor internet",
+          "Easy one-hand usage",
+          "Quick mobile payments"
+        ],
+        "how_to_use": "Access the website from any mobile browser or download our mobile app. All features are optimized for touch interaction.",
+        "related_features": ["Mobile App", "Progressive Web App", "Location Services"]
+      }
+    ],
+    "customer_support": [
+      {
+        "feature_id": "WF007",
+        "feature_name": "24/7 AI Chatbot Assistant",
+        "category": "Customer Support",
+        "description": "Intelligent chatbot providing instant support for bookings, queries, and travel assistance in multiple languages",
+        "functionality": [
+          "Natural language query processing",
+          "Booking assistance and modifications",
+          "Real-time flight/train status updates", 
+          "Cancellation and refund guidance",
+          "Travel document requirements",
+          "Weather and destination information",
+          "Complaint registration and tracking",
+          "Human agent escalation"
+        ],
+        "technical_details": {
+          "response_time": "< 3 seconds",
+          "query_resolution_rate": "85% without human intervention",
+          "languages_supported": 8,
+          "available_24x7": true,
+          "integration_depth": "Full booking system access",
+          "learning_capability": "Continuous improvement through interactions"
+        },
+        "user_benefits": [
+          "Instant help anytime",
+          "Quick problem resolution",
+          "Multi-language support",
+          "No waiting in queues",
+          "Consistent service quality"
+        ],
+        "how_to_use": "Click on the chat icon at the bottom right of any page. Type your question in natural language and get instant responses.",
+        "related_features": ["Live Chat", "Help Center", "FAQ Section"]
+      },
+      {
+        "feature_id": "WF008",
+        "feature_name": "Smart Ticket Management",
+        "category": "Customer Support",
+        "description": "Comprehensive ticket management system for customer queries with AI-powered categorization and priority assignment",
+        "functionality": [
+          "Automatic ticket categorization",
+          "Priority-based queue management",
+          "Multi-channel support (email, chat, phone)",
+          "Ticket status tracking",
+          "Automated follow-up reminders",
+          "Customer satisfaction surveys",
+          "Knowledge base integration",
+          "Agent performance analytics"
+        ],
+        "technical_details": {
+          "average_resolution_time": "4 hours for standard queries",
+          "ticket_categories": 20,
+          "support_channels": 5,
+          "customer_satisfaction_score": "4.3/5",
+          "first_contact_resolution": "68%",
+          "escalation_matrix": "3-tier support structure"
+        },
+        "user_benefits": [
+          "Organized query handling",
+          "Transparent resolution process",
+          "Multiple contact options",
+          "Quick issue resolution",
+          "Professional support experience"
+        ],
+        "how_to_use": "Go to 'Contact Us' page, select your issue type, provide details, and submit. You'll receive a ticket number to track progress.",
+        "related_features": ["Customer Support", "Live Chat", "FAQ Section"]
+      }
+    ],
+    "travel_tools": [
+      {
+        "feature_id": "WF009",
+        "feature_name": "Trip Planner & Itinerary Builder",
+        "category": "Travel Planning",
+        "description": "Comprehensive trip planning tool that helps users create detailed itineraries with integrated bookings",
+        "functionality": [
+          "Multi-city trip planning",
+          "Day-wise itinerary creation",
+          "Local attraction suggestions",
+          "Restaurant and activity recommendations",
+          "Budget planning and tracking",
+          "Travel document checklist",
+          "Packing list generator",
+          "Shareable itinerary with family/friends"
+        ],
+        "technical_details": {
+          "destination_database": "500+ Indian cities with local information",
+          "attraction_listings": "10,000+ points of interest",
+          "integration_partners": "TripAdvisor, Google Places, Zomato",
+          "offline_access": "Download itineraries for offline viewing",
+          "collaboration_features": "Multiple users can edit shared trips"
+        },
+        "user_benefits": [
+          "Organized travel planning",
+          "Discover hidden gems",
+          "Stay within budget",
+          "Never miss important documents",
+          "Share plans with travel companions"
+        ],
+        "how_to_use": "Go to 'Plan Trip' section, enter your destinations and dates, add activities and attractions, then book integrated travel services.",
+        "related_features": ["Destination Guide", "Local Experiences", "Travel Documents"]
+      },
+      {
+        "feature_id": "WF010",
+        "feature_name": "Travel Document Manager",
+        "category": "Travel Management",
+        "description": "Secure digital wallet for storing and managing travel documents with expiry alerts and sharing capabilities",
+        "functionality": [
+          "Digital document storage",
+          "Passport and visa scanning",
+          "Expiry date reminders",
+          "Document sharing with family",
+          "Backup and sync across devices",
+          "Travel insurance integration",
+          "Emergency contact information",
+          "Document requirement checker"
+        ],
+        "technical_details": {
+          "storage_capacity": "Unlimited documents per user",
+          "security_encryption": "AES-256 encryption",
+          "supported_formats": "PDF, JPG, PNG",
+          "sync_platforms": "iOS, Android, Web",
+          "reminder_system": "30/60/90 days before expiry",
+          "sharing_permissions": "View-only, time-limited access"
+        },
+        "user_benefits": [
+          "Never lose important documents",
+          "Always know expiry dates",
+          "Quick document access while traveling",
+          "Secure cloud storage",
+          "Easy family document management"
+        ],
+        "how_to_use": "Go to 'My Documents', upload or scan your travel documents, set reminder preferences, and organize in folders.",
+        "related_features": ["Profile Management", "Travel Alerts", "Family Account"]
+      }
+    ],
+    "loyalty_and_rewards": [
+      {
+        "feature_id": "WF011",
+        "feature_name": "TravelPoints Loyalty Program",
+        "category": "Rewards & Loyalty",
+        "description": "Comprehensive points-based loyalty program with tier benefits and partner integrations across travel ecosystem",
+        "functionality": [
+          "Points earning on every booking",
+          "Tier-based membership levels",
+          "Exclusive member discounts",
+          "Points redemption for free travel",
+          "Partner airline mile transfers",
+          "Birthday and anniversary bonuses",
+          "Referral program rewards",
+          "Fast-track customer support"
+        ],
+        "technical_details": {
+          "earning_rate": "1 point per ₹10 spent",
+          "tier_levels": ["Bronze", "Silver", "Gold", "Platinum"],
+          "partner_integrations": "25+ airlines, hotels, car rentals",
+          "point_expiration": "24 months from last earning",
+          "redemption_minimum": "1000 points (₹100 value)",
+          "tier_benefits": "Up to 20% additional discounts for Platinum"
+        },
+        "user_benefits": [
+          "Earn rewards on every booking",
+          "Exclusive member-only deals",
+          "Free travel redemptions",
+          "Priority customer service",
+          "Partner program benefits"
+        ],
+        "how_to_use": "Sign up for free membership, earn points on bookings, climb tier levels for better benefits, redeem points for discounts or free travel.",
+        "related_features": ["Member Discounts", "Partner Offers", "Referral Program"]
+      },
+      {
+        "feature_id": "WF012",
+        "feature_name": "Smart Deal Alerts",
+        "category": "Deals & Offers",
+        "description": "AI-powered deal discovery system that sends personalized offers based on user travel patterns and preferences",
+        "functionality": [
+          "Personalized deal recommendations",
+          "Flash sale notifications",
+          "Seasonal offer alerts",
+          "Last-minute deal suggestions",
+          "Group booking discounts",
+          "Festival special offers",
+          "Corporate travel deals",
+          "Student and senior citizen discounts"
+        ],
+        "technical_details": {
+          "personalization_algorithm": "Machine learning based on 50+ user factors",
+          "deal_categories": 15,
+          "notification_frequency": "Customizable (daily to weekly)",
+          "discount_range": "10% to 60% off regular prices",
+          "exclusive_deals": "30% of offers available only to app users",
+          "deal_validity": "Clear expiry times and terms"
+        },
+        "user_benefits": [
+          "Never miss great deals",
+          "Save money on travel",
+          "Get relevant offers only",
+          "Early access to sales",
+          "Exclusive member pricing"
+        ],
+        "how_to_use": "Enable notifications in your profile settings, set deal preferences, and receive personalized offers via your chosen communication channel.",
+        "related_features": ["Push Notifications", "Email Marketing", "Loyalty Program"]
+      }
+    ],
+    "security_and_privacy": [
+      {
+        "feature_id": "WF013",
+        "feature_name": "Advanced Security Framework",
+        "category": "Security",
+        "description": "Multi-layered security system protecting user data and transactions with industry-leading encryption and fraud detection",
+        "functionality": [
+          "Two-factor authentication",
+          "Biometric login support",
+          "Real-time fraud detection",
+          "Secure payment processing",
+          "Data encryption at rest and transit",
+          "Session management and timeouts",
+          "Suspicious activity monitoring",
+          "GDPR compliance features"
+        ],
+        "technical_details": {
+          "encryption_standard": "AES-256 bit encryption",
+          "compliance_certifications": ["PCI DSS", "ISO 27001", "SOC 2 Type II"],
+          "fraud_detection_accuracy": "99.3%",
+          "authentication_methods": "SMS OTP, Email OTP, Google Authenticator, Biometrics",
+          "data_retention_policy": "User-controlled data deletion",
+          "security_monitoring": "24/7 SOC monitoring"
+        },
+        "user_benefits": [
+          "Complete data protection",
+          "Safe payment transactions",
+          "Privacy control",
+          "Fraud protection",
+          "Compliance with regulations"
+        ],
+        "how_to_use": "Security features work automatically. Enable two-factor authentication in account settings for additional protection.",
+        "related_features": ["Account Security", "Payment Security", "Privacy Settings"]
+      }
+    ]
+  },
+  "common_feature_queries": [
+    "How do I search for flights?",
+    "Can I book tickets in Hindi?",
+    "How does price tracking work?",
+    "What is your loyalty program?",
+    "Is mobile booking secure?",
+    "How to contact customer support?",
+    "Can I plan multi-city trips?",
+    "What payment methods do you accept?",
+    "How to get deal notifications?",
+    "Is my personal data safe?",
+    "Can I modify bookings online?",
+    "How does the chatbot work?",
+    "What are the membership benefits?",
+    "Can I save my travel documents?",
+    "How to track my booking?",
+    "What languages do you support?",
+    "How fast is your website?",
+    "Can I book for groups?",
+    "How to earn loyalty points?",
+    "What security measures do you have?"
+  ],
+  "feature_categories": {
+    "search_and_booking": "Features related to finding and booking travel options",
+    "user_experience": "Interface, design, and personalization features", 
+    "customer_support": "Help, support, and assistance features",
+    "travel_tools": "Planning, management, and utility features",
+    "loyalty_and_rewards": "Programs for regular users and deals",
+    "security_and_privacy": "Data protection and secure transaction features"
+  },
+  "integration_apis": {
+    "payment_gateways": ["Razorpay", "PayU", "CCAvenue", "Paytm", "PhonePe", "Google Pay"],
+    "travel_providers": ["Indian Railways API", "GDS Systems", "Hotel APIs", "Bus Operator APIs"],
+    "communication": ["SMS Gateway", "Email Service", "WhatsApp Business API", "Push Notifications"],
+    "maps_and_location": ["Google Maps", "Here Maps", "Location Services"],
+    "analytics": ["Google Analytics", "Custom Analytics Dashboard", "User Behavior Tracking"]
+  }
+}

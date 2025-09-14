@@ -1,0 +1,5 @@
+[
+  {"user_id": 34567, "password": "abcd@1345", "role": "admin"},
+  {"user_id": 24565, "password": "abcd@1345", "role": "user"},
+  {"user_id": 46777, "password": "abcd@1345", "role": "support_agent"}
+]
