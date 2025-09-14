@@ -77,6 +77,7 @@ CREATE TABLE conversations (
     message TEXT NOT NULL,
     sender TEXT NOT NULL, -- 'user' or 'assistant'
     session_id TEXT,
+    thread_id TEXT,
     workspace_id TEXT DEFAULT 'default',
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );

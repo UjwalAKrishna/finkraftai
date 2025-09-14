@@ -6,6 +6,8 @@ import json
 import time
 from datetime import datetime
 import pandas as pd
+from utils.session import SessionManager, ConversationManager
+from components.chat_ui import render_conversation_sidebar, render_user_selector, render_enhanced_chat_interface
 
 # Configuration
 API_BASE_URL = "http://localhost:8000"
@@ -68,14 +70,8 @@ st.markdown("""
 
 def initialize_session_state():
     """Initialize session state variables"""
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
-    if 'current_user' not in st.session_state:
-        st.session_state.current_user = "john_doe"
-    if 'user_permissions' not in st.session_state:
-        st.session_state.user_permissions = []
-    if 'session_id' not in st.session_state:
-        st.session_state.session_id = f"streamlit_{int(time.time())}"
+    # Use the enhanced session manager
+    SessionManager.init_session_state()
 
 def make_api_call(endpoint, method="GET", data=None):
     """Make API call to backend"""
@@ -108,70 +104,22 @@ def load_user_permissions():
 def main():
     """Main application"""
     initialize_session_state()
+    load_user_permissions()
     
-    # Header
+    # Header with user selector
     st.markdown('<div class="main-header">🤖 FinkraftAI - Unified Business Assistant</div>', unsafe_allow_html=True)
+    render_user_selector()
     
-    # Sidebar
-    with st.sidebar:
-        st.header("🔧 Control Panel")
-        
-        # User Selection
-        st.subheader("👤 User")
-        users = ["john_doe", "jane_smith", "admin_user", "viewer_user"]
-        current_user = st.selectbox(
-            "Select User",
-            users,
-            index=users.index(st.session_state.current_user)
-        )
-        
-        if current_user != st.session_state.current_user:
-            st.session_state.current_user = current_user
-            st.session_state.chat_history = []  # Clear chat on user change
-            st.rerun()
-        
-        # Load user info
-        user_info = load_user_permissions()
-        if user_info:
-            st.success(f"**Role:** {user_info.get('groups', ['Unknown'])[0]}")
-            st.info(f"**Tools:** {len(user_info.get('allowed_tools', []))}")
-            st.info(f"**Permissions:** {len(st.session_state.user_permissions)}")
-        
-        st.divider()
-        
-        # Quick Actions
-        st.subheader("⚡ Quick Actions")
-        
-        if st.button("🔍 Sample: Filter Invoices", use_container_width=True):
-            sample_message = "Filter invoices for last month, vendor=IndiSky, status=failed"
-            process_message(sample_message)
-            st.rerun()
-        
-        if st.button("🎫 Sample: Create Ticket", use_container_width=True):
-            sample_message = "Create a ticket about failed invoices"
-            process_message(sample_message)
-            st.rerun()
-        
-        if st.button("📊 Sample: View Tickets", use_container_width=True):
-            sample_message = "Show my tickets"
-            process_message(sample_message)
-            st.rerun()
-        
-        st.divider()
-        
-        # System Status
-        st.subheader("🏥 System Health")
-        health_check = make_api_call("/")
-        if health_check["success"]:
-            st.success("✅ Backend Online")
-        else:
-            st.error("❌ Backend Offline")
+    st.divider()
     
-    # Main content area with tabs
+    # Render conversation history sidebar (like ChatGPT)
+    render_conversation_sidebar()
+    
+    # Main content area - focus on chat interface
     tab1, tab2, tab3, tab4 = st.tabs(["💬 Chat Assistant", "📊 Dashboard", "🎫 Tickets", "👤 Admin"])
     
     with tab1:
-        render_chat_interface()
+        render_enhanced_chat_interface()
     
     with tab2:
         render_dashboard()
@@ -185,12 +133,22 @@ def main():
 def process_message(message):
     """Process user message through the backend"""
     
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # If no current conversation, create one
+    if not st.session_state.current_conversation_id:
+        conv_id = ConversationManager.create_new_conversation()
+        st.session_state.current_conversation_id = conv_id
+    
     # Add user message to chat
     st.session_state.chat_history.append({
         "role": "user",
         "message": message,
-        "timestamp": datetime.now().strftime("%H:%M:%S")
+        "timestamp": timestamp
     })
+    
+    # Save to current conversation
+    ConversationManager.save_current_conversation()
     
     # Try direct tool execution for reliable demo
     if "filter" in message.lower() and "invoice" in message.lower():
@@ -238,7 +196,7 @@ def process_message(message):
             "role": "assistant",
             "message": format_response(response_data),
             "success": True,
-            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "timestamp": timestamp,
             "data": response_data
         })
     else:
@@ -246,8 +204,11 @@ def process_message(message):
             "role": "assistant",
             "message": f"Service error: {result.get('error', 'Unknown error')}",
             "success": False,
-            "timestamp": datetime.now().strftime("%H:%M:%S")
+            "timestamp": timestamp
         })
+    
+    # Save updated conversation
+    ConversationManager.save_current_conversation()
 
 def format_response(data):
     """Format API response for display"""

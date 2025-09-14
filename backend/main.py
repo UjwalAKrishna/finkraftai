@@ -6,7 +6,6 @@ from typing import Optional, Dict, Any
 from backend.tools.base_tool import UserContext
 from backend.core.tool_registry import registry
 from backend.core.memory_aware_agent import memory_aware_agent
-from backend.core.planning_engine import planning_engine
 from backend.core.tool_registry import registry
 from backend.routers.tickets import router as tickets_router
 from backend.routers.admin import router as admin_router
@@ -45,6 +44,25 @@ class ChatRequest(BaseModel):
 def root():
     """Simple health check"""
     return {"message": "FinkraftAI Backend is running", "status": "ok"}
+
+@app.get("/api/download/{filename}")
+def download_file(filename: str):
+    """Download exported files"""
+    import os
+    from fastapi.responses import FileResponse
+    
+    try:
+        file_path = os.path.join("exports", filename)
+        if os.path.exists(file_path):
+            return FileResponse(
+                path=file_path,
+                filename=filename,
+                media_type='application/octet-stream'
+            )
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/execute_tool")
 def execute_tool(request: MessageRequest):
@@ -173,17 +191,30 @@ def chat_with_agent(request: ChatRequest):
         # Process message through memory-aware agent
         response = memory_aware_agent.process_message(request.message, user_context, request.session_id if hasattr(request, 'session_id') else None)
         
+        # Get detailed trace information if available
+        trace_details = None
+        if response.get("trace_id"):
+            from backend.services.trace_service import trace_service
+            trace_details = trace_service.get_trace(response["trace_id"])
+        
         return {
             "user_message": request.message,
             "agent_response": response["message"],
             "success": response["success"],
             "tool_used": response.get("tool_used"),
-            "parameters": response.get("parameters"),
-            "confidence": response.get("confidence"),
+            "trace_id": response.get("trace_id"),
+            "plan_summary": response.get("plan_summary"),
+            "trace_details": trace_details,
+            "trace_summary": response.get("trace_summary"),
             "suggestions": response.get("suggestions", []),
-            "llm_response": response.get("llm_response", {}),
-            "memory_context": response.get("memory_context", {}),
-            "thread_id": response.get("thread_id")
+            "analysis": response.get("analysis", ""),
+            "show_traces": response.get("show_traces", False),
+            "cached": response.get("cached", False),
+            "execution_details": {
+                "steps_completed": response.get("plan_summary", {}).get("completed_steps"),
+                "total_steps": response.get("plan_summary", {}).get("total_steps"),
+                "execution_time_ms": response.get("plan_summary", {}).get("execution_time_ms")
+            }
         }
         
     except Exception as e:
@@ -211,6 +242,125 @@ def get_conversation_threads(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/memory/{user_id}/threads/{thread_id}/messages")
+def get_thread_messages(user_id: str, thread_id: str, limit: int = 50):
+    """Get messages from a specific conversation thread"""
+    
+    try:
+        messages = memory_aware_agent.get_thread_messages(user_id, thread_id, limit)
+        return {"messages": messages}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/memory/{user_id}/threads/new")
+def create_new_thread(user_id: str, title: str = None):
+    """Create a new conversation thread explicitly"""
+    
+    try:
+        import time
+        from datetime import datetime
+        from database.connection import db_manager
+        
+        # Create new thread manually since we simplified the memory manager
+        thread_id = f"thread_{user_id}_{int(time.time())}"
+        if not title:
+            title = f"Chat {datetime.now().strftime('%m-%d %H:%M')}"
+        
+        # Deactivate existing threads
+        db_manager.execute_query("""
+            UPDATE conversation_threads SET is_active = 0 WHERE user_id = ?
+        """, (user_id,))
+        
+        # Create new thread
+        db_manager.execute_query("""
+            INSERT OR IGNORE INTO conversation_threads (thread_id, user_id, title, is_active)
+            VALUES (?, ?, ?, 1)
+        """, (thread_id, user_id, title))
+        
+        return {"success": True, "thread_id": thread_id, "message": f"Created new thread {thread_id}"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# LLM Provider Management Endpoints
+
+@app.get("/llm/status")
+def get_llm_status():
+    """Get current LLM provider status and available providers"""
+    
+    try:
+        from backend.config.llm_config import LLMConfigManager
+        status = LLMConfigManager.get_provider_status()
+        return status
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/llm/switch/{provider_name}")
+def switch_llm_provider(provider_name: str):
+    """Switch to a different LLM provider"""
+    
+    try:
+        from backend.core.llm_provider import llm_manager
+        
+        success = llm_manager.switch_provider(provider_name)
+        if success:
+            return {
+                "success": True,
+                "message": f"Switched to {provider_name}",
+                "current_provider": llm_manager.get_current_provider()
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Failed to switch to {provider_name}",
+                "current_provider": llm_manager.get_current_provider()
+            }
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/llm/test/{provider_name}")
+def test_llm_provider(provider_name: str):
+    """Test a specific LLM provider"""
+    
+    try:
+        from backend.core.llm_provider import llm_manager
+        
+        # Save current provider
+        original_provider = llm_manager.get_current_provider()
+        
+        # Switch to test provider
+        llm_manager.switch_provider(provider_name)
+        
+        # Test with simple prompt
+        test_prompt = "Respond with exactly: 'LLM test successful'"
+        response = llm_manager.generate_response(test_prompt)
+        
+        # Switch back to original provider
+        if original_provider:
+            for provider in llm_manager.providers:
+                if provider.get_provider_name() == original_provider:
+                    llm_manager.current_provider = provider
+                    break
+        
+        return {
+            "success": True,
+            "provider": provider_name,
+            "test_response": response,
+            "message": f"{provider_name} is working correctly"
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "provider": provider_name,
+            "error": str(e),
+            "message": f"{provider_name} test failed"
+        }
+
 @app.post("/memory/{user_id}/threads/{thread_id}/activate")
 def activate_thread(user_id: str, thread_id: str):
     """Switch to a specific conversation thread"""
@@ -233,89 +383,6 @@ def get_memory_insights(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/plans/create")
-def create_execution_plan(request: dict):
-    """Create an execution plan for complex workflows"""
-    
-    try:
-        user_id = request.get("user_id")
-        goal = request.get("goal")
-        template_name = request.get("template_name")
-        custom_params = request.get("custom_params", {})
-        
-        user_context = UserContext(user_id=user_id)
-        
-        plan = planning_engine.create_plan(
-            goal=goal,
-            user_context=user_context,
-            template_name=template_name,
-            custom_params=custom_params
-        )
-        
-        return {
-            "success": True,
-            "plan_id": plan.plan_id,
-            "goal": plan.goal,
-            "description": plan.description,
-            "steps": len(plan.steps),
-            "approval_required": plan.approval_required
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/plans/{plan_id}/execute")
-def execute_plan(plan_id: str, user_id: str):
-    """Execute an approved plan"""
-    
-    try:
-        user_context = UserContext(user_id=user_id)
-        result = planning_engine.execute_plan_sync(plan_id, user_context)
-        return result
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/plans/{plan_id}/status")
-def get_plan_status(plan_id: str):
-    """Get plan execution status"""
-    
-    try:
-        status = planning_engine.get_plan_status(plan_id)
-        return status
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/plans/user/{user_id}")
-def get_user_plans(user_id: str, limit: int = 20):
-    """Get user's execution plans"""
-    
-    try:
-        plans = planning_engine.get_user_plans(user_id, limit)
-        return {"plans": plans}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/plans/templates")
-def get_plan_templates():
-    """Get available plan templates"""
-    
-    try:
-        templates = {}
-        for name, template in planning_engine.business_templates.items():
-            templates[name] = {
-                "description": template.get("description", ""),
-                "steps": len(template.get("steps", [])),
-                "approval_required": template.get("approval_required", False),
-                "keywords": template.get("keywords", [])
-            }
-        
-        return {"templates": templates}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

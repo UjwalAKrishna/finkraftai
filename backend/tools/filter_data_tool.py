@@ -159,20 +159,39 @@ class FilterDataTool(BaseTool):
         query += " ORDER BY i.invoice_date DESC LIMIT 100"
         
         # Execute query
-        from backend.core.database_connector import db_connector
-        results = db_connector.execute_query(query, tuple(query_params))
+        import sqlite3
+        import os
         
-        # Get total count (before limit) - simplified
-        count_query = """
-        SELECT COUNT(*) as total
-        FROM invoices i
-        JOIN vendors v ON i.vendor_id = v.id
-        WHERE 1=1
-        """
-        if conditions:
-            count_query = count_query + " AND " + " AND ".join(conditions)
+        # Connect to business database
+        db_path = "business_data.db"
+        if not os.path.exists(db_path):
+            # Create the database if it doesn't exist
+            from external_db.business_data import create_business_database
+            create_business_database(db_path)
         
-        count_result = db_connector.execute_query(count_query, tuple(query_params), fetch_one=True)
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        try:
+            # Execute main query
+            cursor.execute(query, tuple(query_params))
+            results = [dict(row) for row in cursor.fetchall()]
+            
+            # Get total count (before limit) - simplified
+            count_query = """
+            SELECT COUNT(*) as total
+            FROM invoices i
+            JOIN vendors v ON i.vendor_id = v.id
+            WHERE 1=1
+            """
+            if conditions:
+                count_query = count_query + " AND " + " AND ".join(conditions)
+            
+            cursor.execute(count_query, tuple(query_params))
+            count_result = dict(cursor.fetchone())
+        finally:
+            conn.close()
         total_count = count_result['total'] if count_result else 0
         
         # Format response
@@ -243,8 +262,24 @@ class FilterDataTool(BaseTool):
         
         query += " ORDER BY s.sale_date DESC LIMIT 100"
         
-        from backend.core.database_connector import db_connector
-        results = db_connector.execute_query(query, tuple(query_params))
+        import sqlite3
+        import os
+        
+        # Connect to business database
+        db_path = "business_data.db"
+        if not os.path.exists(db_path):
+            from external_db.business_data import create_business_database
+            create_business_database(db_path)
+        
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute(query, tuple(query_params))
+            results = [dict(row) for row in cursor.fetchall()]
+        finally:
+            conn.close()
         
         response_data = {
             "dataset": "sales",
@@ -304,8 +339,24 @@ class FilterDataTool(BaseTool):
         
         query += " ORDER BY t.transaction_date DESC LIMIT 100"
         
-        from backend.core.database_connector import db_connector
-        results = db_connector.execute_query(query, tuple(query_params))
+        import sqlite3
+        import os
+        
+        # Connect to business database
+        db_path = "business_data.db"
+        if not os.path.exists(db_path):
+            from external_db.business_data import create_business_database
+            create_business_database(db_path)
+        
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute(query, tuple(query_params))
+            results = [dict(row) for row in cursor.fetchall()]
+        finally:
+            conn.close()
         
         response_data = {
             "dataset": "transactions",

@@ -29,6 +29,11 @@ class DatabaseManager:
                 schema_sql = f.read()
             conn.executescript(schema_sql)
             conn.commit()
+
+            with open("database/migrations/002_memory_schema.sql", "r") as f:
+                schema_sql = f.read()
+            conn.executescript(schema_sql)
+            conn.commit()
             print("✓ Database schema created")
             
             # Insert sample data

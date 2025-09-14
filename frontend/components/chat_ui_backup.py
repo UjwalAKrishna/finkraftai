@@ -1,4 +1,4 @@
-# Chat interface component - Fixed UX Version
+# Chat interface component
 import streamlit as st
 from datetime import datetime
 from utils.session import ConversationManager
@@ -168,7 +168,7 @@ def render_user_selector():
                 st.rerun()
 
 def render_enhanced_chat_interface():
-    """Render the enhanced chat interface with ChatGPT-like UX"""
+    """Render the enhanced chat interface with context awareness"""
     
     st.header("💬 Natural Language Business Assistant")
     
@@ -186,117 +186,66 @@ def render_enhanced_chat_interface():
     else:
         st.info("🆕 **New Conversation** - Start chatting to create a thread")
     
-    # Create a scrollable message area
-    message_container = st.container()
+    # Sample commands
+    st.markdown("""
+    💡 **Sample Commands:**
+    - "Filter invoices from last month"
+    - "Create a ticket for system maintenance"  
+    - "Show me all open tickets"
+    - "Export sales data to Excel"
+    """)
     
-    with message_container:
-        if st.session_state.chat_history:
-            # Display messages in chronological order (oldest first, newest last)
-            for message in st.session_state.chat_history:
-                if message["role"] == "user":
-                    with st.chat_message("user"):
-                        st.write(f"**You** ({message['timestamp']})")
-                        st.write(message["message"])
-                else:
-                    with st.chat_message("assistant"):
-                        st.write(f"**FinkraftAI** ({message['timestamp']})")
-                        
-                        if message.get("success", True):
-                            # PRIMARY: Natural language response prominently displayed
-                            st.markdown(f"**{message['message']}**")
-                            
-                            # CONTEXT CONTINUITY: Show suggestions for next actions (key PRD requirement)
-                            response_data = message.get("data", {})
-                            suggestions = response_data.get("suggestions", [])
-                            
-                            if suggestions:
-                                st.info("💡 **What you can do next:**")
-                                cols = st.columns(min(len(suggestions), 3))
-                                for i, suggestion in enumerate(suggestions[:3]):
-                                    with cols[i]:
-                                        if st.button(f"📋 {suggestion}", key=f"suggestion_{message.get('timestamp', '')}_{i}", use_container_width=True):
-                                            process_user_message(suggestion)
-                                            st.rerun()
-                            
-                            # SECONDARY: Trace details in collapsible section (optional viewing)
-                            tool_used = message.get("tool_used")
-                            
-                            # Only show trace dropdown if there's technical information available
-                            show_trace = (tool_used and tool_used != "llm_only") or response_data.get("trace_summary")
-                            
-                            if show_trace:
-                                with st.expander("🔍 **Show Details** - Execution Trace"):
-                                    # Tool execution info
-                                    if tool_used:
-                                        st.write(f"**🔧 Tools Used:** {tool_used}")
-                                    
-                                    # Execution summary from new system
-                                    if response_data.get("trace_summary"):
-                                        st.write("**📋 Execution Summary:**")
-                                        st.text(response_data["trace_summary"])
-                                    
-                                    # Detailed trace information
-                                    if response_data.get("trace_details"):
-                                        st.write("**🕰️ Detailed Trace:**")
-                                        trace_details = response_data["trace_details"]
-                                        
-                                        if trace_details.get("tool_calls"):
-                                            for i, tool_call in enumerate(trace_details["tool_calls"], 1):
-                                                st.write(f"**Step {i}:** {tool_call.get('tool_name', 'Unknown')}")
-                                                if tool_call.get("parameters"):
-                                                    st.json(tool_call["parameters"])
-                                                if tool_call.get("execution_time_ms"):
-                                                    st.write(f"⏱️ Execution time: {tool_call['execution_time_ms']}ms")
-                                                st.divider()
-                                    
-                                    # Plan summary if available
-                                    if response_data.get("plan_summary"):
-                                        plan = response_data["plan_summary"]
-                                        st.write("**🎯 Plan Summary:**")
-                                        st.write(f"• Goal: {plan.get('goal', 'N/A')}")
-                                        st.write(f"• Steps: {plan.get('completed_steps', 0)}/{plan.get('total_steps', 0)}")
-                                        st.write(f"• Time: {plan.get('execution_time_ms', 0)}ms")
-                                    
-                                    # Raw data for power users
-                                    if response_data and len(str(response_data)) > 50:
-                                        with st.expander("🔬 **Raw Data** (Advanced)"):
-                                            st.json(response_data)
-                        else:
-                            st.error(message["message"])
-        else:
-            # Empty state - welcome message
-            st.markdown("""
-            <div style="text-align: center; padding: 50px; color: #666;">
-                <h3>👋 Welcome to FinkraftAI!</h3>
-                <p>Start a conversation by typing a message below.</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Show sample commands as clickable buttons when no messages
-            st.markdown("**💡 Try these commands:**")
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("🔍 Filter invoices from last month", use_container_width=True):
-                    process_user_message("Filter invoices from last month")
-                    st.rerun()
-                if st.button("📊 Show me all tickets", use_container_width=True):
-                    process_user_message("Show me all tickets")
-                    st.rerun()
-            with col2:
-                if st.button("🎫 Create a maintenance ticket", use_container_width=True):
-                    process_user_message("Create a ticket for system maintenance")
-                    st.rerun()
-                if st.button("📋 Export sales data", use_container_width=True):
-                    process_user_message("Export sales data to Excel")
-                    st.rerun()
-    
-    # CRITICAL UX FIX: Chat input at BOTTOM (like ChatGPT)
+    # Chat input
     user_input = st.chat_input("Ask me anything about your business data...")
     
     if user_input:
         # Process through backend - it will create thread automatically
         process_user_message(user_input)
         st.rerun()
+    
+    # Chat history display
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.chat_history:
+            if message["role"] == "user":
+                with st.chat_message("user"):
+                    st.write(f"**You** ({message['timestamp']})")
+                    st.write(message["message"])
+            else:
+                with st.chat_message("assistant"):
+                    st.write(f"**FinkraftAI** ({message['timestamp']})")
+                    
+                    if message.get("success", True):
+                        st.write(message["message"])
+                        
+                        # Show trace information
+                        if message.get("tool_used"):
+                            st.info(f"🔧 **Tool Used:** {message['tool_used']}")
+                            
+                            if message.get("parameters"):
+                                with st.expander("🔍 **Show Your Work** - Execution Details"):
+                                    st.write("**Parameters:**")
+                                    st.json(message["parameters"])
+                                    
+                                    trace_data = message.get("trace_data", {})
+                                    if trace_data.get("confidence"):
+                                        st.write(f"**Confidence:** {trace_data['confidence']}")
+                                    
+                                    if trace_data.get("suggestions"):
+                                        st.write("**Suggestions:**")
+                                        for suggestion in trace_data["suggestions"]:
+                                            st.write(f"• {suggestion}")
+                                    
+                                    if trace_data.get("memory_context"):
+                                        st.write("**Memory Context:**")
+                                        st.json(trace_data["memory_context"])
+                        
+                        # Show data if available
+                        if "data" in message and message["data"]:
+                            with st.expander("📊 View Data Results"):
+                                st.json(message["data"])
+                    else:
+                        st.error(message["message"])
 
 def process_user_message(message: str):
     """Process user message through backend chat API"""
@@ -329,21 +278,18 @@ def process_user_message(message: str):
             if result.get("thread_id"):
                 st.session_state.current_thread_id = result["thread_id"]
             
-            # Add assistant response with enhanced trace information and suggestions
+            # Add assistant response
             st.session_state.chat_history.append({
                 "role": "assistant",
                 "message": result["agent_response"],
                 "success": result["success"],
                 "timestamp": timestamp,
                 "tool_used": result.get("tool_used"),
-                "data": {
-                    "trace_summary": result.get("trace_summary"),
-                    "trace_details": result.get("trace_details"),
-                    "plan_summary": result.get("plan_summary"),
-                    "execution_details": result.get("execution_details"),
+                "parameters": result.get("parameters"),
+                "trace_data": {
+                    "confidence": result.get("confidence"),
                     "suggestions": result.get("suggestions", []),
-                    "analysis": result.get("analysis", ""),
-                    "show_traces": result.get("show_traces", False)
+                    "memory_context": result.get("memory_context", {})
                 }
             })
         else:
