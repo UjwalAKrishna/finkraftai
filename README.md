@@ -8,7 +8,7 @@ This workspace contains two different implementation approaches for the same pro
 A complete enterprise-grade implementation featuring:
 - **Backend**: FastAPI-based API with modular architecture
 - **Frontend**: Streamlit-based user interface
-- **Database**: PostgreSQL with migrations and repositories
+- **Database**: SQLite3 with migrations and repositories
 - **Core Features**: 
   - Memory-aware agents
   - Planning system
